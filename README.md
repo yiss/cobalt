@@ -5,6 +5,8 @@ Cobalt is a Base UI design system and documentation site, rebuilt from the
 low-contrast visual language: 40 source-distributed components, a routed component reference,
 light and dark themes, and self-hosted typography.
 
+**Live documentation:** <https://cobalt-design-system.yiss.workers.dev>
+
 The docs are the working specification. Every component has a live preview, source example,
 installation and usage guidance, an API table, accessibility notes, and focused state examples.
 The design decisions live in one stylesheet so the library and its documentation stay aligned.
@@ -33,6 +35,7 @@ Vite prints the local docs URL, normally <http://127.0.0.1:5173>.
 | `pnpm dev`     | Start the documentation app                     |
 | `pnpm build`   | Type-check and create a production build        |
 | `pnpm preview` | Preview the production build locally            |
+| `pnpm deploy`  | Build and deploy the docs to Cloudflare         |
 | `pnpm lint`    | Run Oxlint, the React rules, and `@shadcn/lint` |
 | `pnpm format`  | Format with Oxfmt                               |
 | `pnpm check`   | Run formatting, linting, and type checks        |
@@ -48,6 +51,7 @@ Vite prints the local docs URL, normally <http://127.0.0.1:5173>.
 - Keyline Icons for public iconography
 - Timeless Sans and Commit Mono, self-hosted
 - Prism React Renderer for syntax-highlighted code examples
+- Cloudflare Workers Static Assets, deployed with [`cf`](https://developers.cloudflare.com/cf/)
 
 ## Docs routes
 
@@ -63,6 +67,21 @@ The header includes `⌘K` documentation search with grouped results, keyboard n
 command-palette layout. On smaller screens the sidebar becomes a drawer and the table of contents
 is hidden. The app uses `BrowserRouter`, so static hosts must rewrite unknown paths to
 `index.html`.
+
+## Deployment
+
+The docs are deployed to Cloudflare Workers Static Assets at
+<https://cobalt-design-system.yiss.workers.dev>. `cloudflare.config.ts` enables Workers
+observability and SPA fallback for the client-side router.
+
+```bash
+pnpm deploy
+```
+
+That command type-checks, builds the Cloudflare output with the Vite plugin, and uploads it with
+`cf deploy --prebuilt --mode production`. The Worker name is `cobalt-design-system`. `cf` is in
+beta; authenticate once with `cf auth login` or provide `CLOUDFLARE_API_TOKEN` and
+`CLOUDFLARE_ACCOUNT_ID` in CI.
 
 ## Components
 
@@ -155,6 +174,7 @@ Every state change also has a static cue: color, border, label, icon, or positio
 
 ```text
 CobaltDS.fig                 Original source design
+cloudflare.config.ts         Workers name, observability, and SPA fallback
 src/components/ui/           Base UI wrappers and component styles
 src/components/docs/         Documentation shell, search, previews, code surfaces
 src/pages/                   Routed documentation pages
@@ -162,7 +182,7 @@ src/docs/                    Examples, usage snippets, API metadata, registry
 src/assets/fonts/            Self-hosted Timeless Sans and Commit Mono files
 src/index.css                Theme tokens, component states, motion, docs styles
 components.json              shadcn-compatible aliases and theme location
-vite.config.ts               Vite Plus, Tailwind, lint, and alias configuration
+vite.config.ts               Vite Plus, Cloudflare, Tailwind, lint, and alias configuration
 ```
 
 ## Conventions
